@@ -143,12 +143,47 @@ def build_graph(dur, audio, image, tag, seed, prompt_text, camera,
     return g
 
 
+def ensure_comfy_file(arg):
+    """参数是本机路径就同步到 ComfyUI input 并返回文件名；已是文件名则原样返回。
+
+    ComfyUI 的 LoadImage / LoadAudio 只认 input 目录下的文件名，
+    直接传本地路径会报 400（Invalid audio file / image not found）。
+    """
+    if not arg:
+        return arg
+    if os.path.exists(arg):
+        cin = _env.get_comfy_input(required=True)
+        name = os.path.basename(arg)
+        dst = os.path.join(cin, name)
+        try:
+            if os.path.abspath(arg) != os.path.abspath(dst):
+                shutil.copy2(arg, dst)
+                print("  同步 %s → ComfyUI input" % name)
+        except Exception as e:
+            print("[警告] 同步到 ComfyUI input 失败：%s" % e)
+        return name
+    return arg
+
+
 def post(path, payload):
     data = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(BASE + path, data=data,
                                  headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.loads(r.read().decode("utf-8"))
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return json.loads(r.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        # 400 的响应体里才有真正的校验失败原因，必须读出来
+        body = e.read().decode("utf-8", "replace")
+        print("HTTP %s %s" % (e.code, e.reason))
+        try:
+            j = json.loads(body)
+            print("error:", j.get("error"))
+            print("node_errors:", json.dumps(
+                j.get("node_errors"), ensure_ascii=False)[:2000])
+        except Exception:
+            print("body:", body[:2000])
+        raise
 
 
 def get(path):
@@ -210,7 +245,9 @@ def main():
     print("请求 %.3fs → 网格 %d 帧 = %.3fs（DG-018 网格）"
           % (args.dur, grid, grid / 24.0))
 
-    g = build_graph(args.dur, args.audio, args.image, args.tag,
+    audio = ensure_comfy_file(args.audio)
+    image = ensure_comfy_file(args.image)
+    g = build_graph(args.dur, audio, image, args.tag,
                     args.seed, prompt_text, args.camera,
                     no_upscale=not args.with_upscale, mp=args.mp,
                     attn=args.attn or None, upscaler=args.upscaler or None)
@@ -221,7 +258,7 @@ def main():
     pid = r.get("prompt_id")
     print("submitted prompt_id = %s" % pid)
     status = {"case": args.tag, "mode": "单次直出(Ref2VA)", "dur_request": args.dur,
-              "grid_frames": grid, "audio": args.audio, "image": args.image,
+              "grid_frames": grid, "audio": audio, "image": image,
               "seed": args.seed, "prompt_id": pid, "state": "running",
               "started": time.time()}
     sp = os.path.join(ASSETS, "run_status_oneshot.json")
@@ -240,11 +277,24 @@ def main():
     outdir = os.path.join(_env.get_comfy_output(required=True),
                           args.tag.split("/")[0])
     pat = os.path.basename(args.tag)
-    src = None
+    # H3 这条链路会出两个文件：
+    #   <prefix>_00001.mp4        纯视频，无音轨
+    #   <prefix>_00001-audio.mp4  视频 + 音轨  ← 要的是这个
+    # 按前缀直接匹配会先命中无后缀那个，导致拿到的成片没有声音。
+    hits = {"with_audio": [], "silent": []}
     for root, _dirs, files in os.walk(outdir):
         for name in files:
-            if name.startswith(pat) and name.endswith(".mp4"):
-                src = os.path.join(root, name)
+            if not (name.startswith(pat) and name.endswith(".mp4")):
+                continue
+            p = os.path.join(root, name)
+            (hits["with_audio"] if name.endswith("-audio.mp4")
+             else hits["silent"]).append(p)
+    src = (max(hits["with_audio"], key=os.path.getmtime)
+           if hits["with_audio"]
+           else (max(hits["silent"], key=os.path.getmtime) if hits["silent"] else None))
+    if src and not src.endswith("-audio.mp4"):
+        print("[提示] 未找到 -audio.mp4，取的是无音轨版本：%s"
+              % os.path.basename(src))
     if src:
         dst = os.path.join(ASSETS, "case1025_oneshot%s.mp4"
                            % ("" if pat == "oneshot" else "_" + pat))
