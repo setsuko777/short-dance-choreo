@@ -99,4 +99,4 @@ python scripts/trim_window.py <audio> --ss 12.6 -t 15 -o window.wav --json windo
 python scripts/shot_grid.py 15 <bpm>
 ```
 
-测试曲目位于 `C:/Users/Admin/cloud_cache/`（剪映云端音乐库缓存，仅供本 Skill 开发测试；对外发布不内置、不分发）。
+测试曲目为开发机本地音频样本，**不随仓库分发**。复跑测试时用 `SDC_TEST_TRACKS` 环境变量指定自己的三档测试曲（慢/中/快），未指定时该段自动跳过。

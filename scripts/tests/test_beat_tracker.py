@@ -79,11 +79,21 @@ def main():
     print("=" * 62)
     print("M0 测试 2/2：真实曲目（慢 / 中 / 快）")
     print("=" * 62)
-    tracks = [
-        "C:/Users/Admin/cloud_cache/7376164934629738505_可爱童真节奏  Happy Ukulele Fun Kids.m4a",
-        "C:/Users/Admin/cloud_cache/7376219644744435738_时尚动感嘻哈节奏  Lowride Cruiser.m4a",
-        "C:/Users/Admin/cloud_cache/7491937596432467994_活力 动感 潮流 快闪 鼓点.m4a",
-    ]
+    # 真实曲目样本：优先读环境变量 SDC_TEST_TRACKS（分号分隔），
+    # 未设置则用开发机上的样本（不随仓库分发，缺失时自动跳过）
+    env_tracks = os.environ.get("SDC_TEST_TRACKS", "")
+    if env_tracks:
+        tracks = [t for t in env_tracks.split(os.pathsep) if t]
+    else:
+        tracks = [
+            "C:/Users/Admin/cloud_cache/7376164934629738505_可爱童真节奏  Happy Ukulele Fun Kids.m4a",
+            "C:/Users/Admin/cloud_cache/7376219644744435738_时尚动感嘻哈节奏  Lowride Cruiser.m4a",
+            "C:/Users/Admin/cloud_cache/7491937596432467994_活力 动感 潮流 快闪 鼓点.m4a",
+        ]
+    if not any(Path(t).exists() for t in tracks):
+        print("  [跳过] 未找到真实曲目样本。")
+        print("         设置 SDC_TEST_TRACKS=<曲1>;<曲2>;<曲3> 可指定自己的测试曲；")
+        print("         合成轨测试（测试 1/2）不依赖音频文件，始终会跑。")
     results = {}
     for t in tracks:
         p = Path(t)

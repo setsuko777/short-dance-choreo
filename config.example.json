@@ -1,0 +1,7 @@
+{
+  "_说明": "复制为 config.json 后按需修改。留空的项会自动探测，大多数机器只需要填 comfyui_root。config.json 已被 .gitignore 忽略，不会进仓库。",
+  "comfyui_root": "",
+  "python_site": "",
+  "ffmpeg": "",
+  "api": "http://127.0.0.1:8188"
+}

@@ -28,6 +28,11 @@ M0 实测记录（2026-10-24，合成 click 轨 90/120/150 BPM 真值校准）:
     - 段落结构为启发式标签（能量 regime 量化），M0 精度要求是"合理"非"完美"
 """
 
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _env  # noqa: E402  环境适配层（消除本机硬编码路径）
+_env.ensure_deps()
 import argparse
 import json
 import os
@@ -36,7 +41,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-import numpy as np
+
+import numpy as np  # noqa: E402
 
 SR = 22050            # 解码采样率（单声道）
 FRAME = 1024          # STFT 帧长（46ms）
@@ -52,26 +58,17 @@ WHITEN_WIN_S = 0.25           # 局部均值白化窗（须 < 最快拍周期/2�
 # ---------------------------------------------------------------- ffmpeg 解析
 
 def _find_ffmpeg():
-    """定位 ffmpeg 二进制：环境变量 → PATH → static_ffmpeg 已知位置。"""
+    """定位 ffmpeg 二进制：FFMPEG_PATH → PATH → static_ffmpeg → _env 配置。
+
+    统一走 `_env.get_ffmpeg()`，避免把任何本机绝对路径写死在代码里。
+    """
     env = os.environ.get("FFMPEG_PATH")
     if env and Path(env).exists():
         return env
     w = shutil.which("ffmpeg")
     if w:
         return w
-    candidates = []
-    try:
-        sp = Path(sys.executable).resolve().parent.parent / "Lib" / "site-packages"
-        candidates.append(sp / "static_ffmpeg" / "bin" / "win32" / "ffmpeg.exe")
-    except Exception:
-        pass
-    candidates.append(
-        Path("C:/Users/Admin/.workbuddy/binaries/python/envs/default/"
-             "Lib/site-packages/static_ffmpeg/bin/win32/ffmpeg.exe"))
-    for c in candidates:
-        if c.exists():
-            return str(c)
-    raise RuntimeError("未找到 ffmpeg：请设置 FFMPEG_PATH 或将其加入 PATH")
+    return _env.get_ffmpeg(required=True)
 
 
 def decode_audio(path, ffmpeg):

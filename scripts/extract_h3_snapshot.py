@@ -1,12 +1,21 @@
 """Extract embedded API prompt graph from an H3 output mp4 and summarize nodes."""
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _env  # noqa: E402  环境适配层（消除本机硬编码路径）
+_env.ensure_deps()
 import json
 import subprocess
+import os
 import sys
 
-sys.path.insert(0, "C:/Users/Admin/.workbuddy/binaries/python/envs/default/Lib/site-packages")
-from static_ffmpeg import run
 
-ffmpeg, ffprobe = run.get_or_fetch_platform_executables_else_raise()
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _env  # noqa: E402  环境适配层
+_env.ensure_deps()
+
+
+ffmpeg = _env.get_ffmpeg()
 
 src = sys.argv[1]
 out = sys.argv[2] if len(sys.argv) > 2 else "h3_snapshot.json"

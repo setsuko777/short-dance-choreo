@@ -6,13 +6,21 @@ to 1080x1920, 24fps. Concat 6 segments, then mux the original window music
 measured downbeats). Output: cases/assets/CASE-2026-1024-01-final.mp4
 """
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _env  # noqa: E402  环境适配层（消除本机硬编码路径）
+_env.ensure_deps()
+import os
 import subprocess
 import sys
 
-sys.path.insert(0, "C:/Users/Admin/.workbuddy/binaries/python/envs/default/Lib/site-packages")
-from static_ffmpeg import run
 
-ffmpeg, _ = run.get_or_fetch_platform_executables_else_raise()
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _env  # noqa: E402  环境适配层
+_env.ensure_deps()
+
+
+ffmpeg = _env.get_ffmpeg()
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS = os.path.join(ROOT, "cases", "assets")
 
@@ -57,7 +65,7 @@ def main():
     print("ASSEMBLED ->", os.path.join(ASSETS, "CASE-2026-1024-01-final.mp4"))
     # verify
     r2 = subprocess.run(
-        [run.get_or_fetch_platform_executables_else_raise()[1], "-v", "quiet",
+        [_env.get_ffprobe(), "-v", "quiet",
          "-show_entries", "stream=codec_name,width,height,r_frame_rate",
          "-show_entries", "format=duration", "-of", "json",
          os.path.join(ASSETS, "CASE-2026-1024-01-final.mp4")],

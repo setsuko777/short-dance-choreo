@@ -18,6 +18,11 @@ Usage:
   python make_anchor.py 5        # shot-5 pure side-profile thighs-to-boots anchor
   python make_anchor.py          # both, sequentially
 """
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _env  # noqa: E402  环境适配层（消除本机硬编码路径）
+_env.ensure_deps()
 import json
 import os
 import shutil
@@ -25,10 +30,12 @@ import sys
 import time
 import urllib.request
 
+
+
 BASE = "http://127.0.0.1:8188"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-INPUT_DIR = "F:/MI10-PRO+/MI10-PRO+/MI10-Pro+/ComfyUI/input"
-OUT_DIR = "F:/MI10-PRO+/MI10-PRO+/MI10-Pro+/ComfyUI/output/anchor"
+INPUT_DIR = _env.get_comfy_input()
+OUT_DIR = os.path.join(_env.get_comfy_output() or ".", "anchor")
 CLIENT = "short-dance-choreo"
 W, H = 832, 1472  # exact H3 canvas for this case (9:16, 0.5MP, mult 32)
 STEPS, CFG = 30, 3.0

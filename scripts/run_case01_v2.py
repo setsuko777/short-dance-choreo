@@ -18,6 +18,11 @@ prompt ordinal renumbering differ. Shots 1/2/3/6 are reused from v1 untouched.
 Usage: python run_case01_v2.py            # shots 4 and 5, sequential
        python run_case01_v2.py 4 5        # same, explicit
 """
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _env  # noqa: E402  环境适配层（消除本机硬编码路径）
+_env.ensure_deps()
 import json
 import os
 import shutil
@@ -27,11 +32,13 @@ import time
 import urllib.error
 import urllib.request
 
+
+
 BASE = "http://127.0.0.1:8188"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # skill root
 SNAP = os.path.join(ROOT, "scripts", "h3_snapshot.json")
 ASSETS = os.path.join(ROOT, "cases", "assets")
-OUTDIR = "F:/MI10-PRO+/MI10-PRO+/MI10-Pro+/ComfyUI/output/CASE-2026-1024-01-v2"
+OUTDIR = os.path.join(_env.get_comfy_output() or ".", "CASE-2026-1024-01-v2")
 STATUS = os.path.join(ASSETS, "run_status_v2.json")
 CLIENT = "short-dance-choreo"
 V2_SHOTS = (4, 5)

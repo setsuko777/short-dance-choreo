@@ -8,14 +8,22 @@ four unchanged shots are reused from v1 (shotN.mp4).
 Output: cases/assets/CASE-2026-1024-01-final-v2.mp4
 """
 import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _env  # noqa: E402  环境适配层（消除本机硬编码路径）
+_env.ensure_deps()
+import os
 import subprocess
 import sys
 
-sys.path.insert(0, "C:/Users/Admin/.workbuddy/binaries/python/envs/default/Lib/site-packages")
-from static_ffmpeg import run
 
-ffmpeg, _ = run.get_or_fetch_platform_executables_else_raise()
-ffprobe = run.get_or_fetch_platform_executables_else_raise()[1]
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _env  # noqa: E402  环境适配层
+_env.ensure_deps()
+
+
+ffmpeg = _env.get_ffmpeg()
+ffprobe = _env.get_ffprobe()
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS = os.path.join(ROOT, "cases", "assets")
 

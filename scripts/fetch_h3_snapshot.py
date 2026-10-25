@@ -5,6 +5,11 @@ Prints candidate prompt_ids whose prompt graph contains H3-related nodes
 the most recent one's full prompt graph to a JSON file for reuse as a
 headless submission template.
 """
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _env  # noqa: E402  环境适配层（消除本机硬编码路径）
+_env.ensure_deps()
 import json
 import sys
 import urllib.request

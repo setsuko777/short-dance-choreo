@@ -1,4 +1,9 @@
 """Inspect a ComfyUI UI-format workflow JSON: nodes, widgets, links."""
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _env  # noqa: E402  环境适配层（消除本机硬编码路径）
+_env.ensure_deps()
 import json
 import sys
 

@@ -22,6 +22,11 @@ Usage:
   python make_anchor03.py char_3q    # one render
   python make_anchor03.py --crop     # numeric crops only
 """
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _env  # noqa: E402  环境适配层（消除本机硬编码路径）
+_env.ensure_deps()
 import json
 import os
 import shutil
@@ -30,10 +35,12 @@ import sys
 import time
 import urllib.request
 
+
+
 BASE = "http://127.0.0.1:8188"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-INPUT_DIR = "F:/MI10-PRO+/MI10-PRO+/MI10-Pro+/ComfyUI/input"
-OUT_DIR = "F:/MI10-PRO+/MI10-PRO+/MI10-Pro+/ComfyUI/output/anchor03"
+INPUT_DIR = _env.get_comfy_input()
+OUT_DIR = os.path.join(_env.get_comfy_output() or ".", "anchor03")
 ASSETS = os.path.join(ROOT, "cases", "assets")
 CLIENT = "short-dance-choreo"
 W, H = 832, 1472
@@ -210,7 +217,7 @@ def run_render(name):
 def subject_bbox(path):
     """Numeric subject bbox via background-color mask (solid bg assumed)."""
     raw = os.path.join(ASSETS, "_tmp.raw")
-    ff = "C:/Users/Admin/.workbuddy/binaries/python/envs/default/Lib/site-packages/static_ffmpeg/bin/win32/ffmpeg.exe"
+    ff = _env.get_ffmpeg()
     subprocess.run([ff, "-v", "error", "-i", path, "-f", "rawvideo",
                     "-pix_fmt", "rgb24", "-y", raw], check=True)
     import numpy as np
@@ -227,7 +234,7 @@ def subject_bbox(path):
 
 def run_crop():
     """Crop head+shoulders bust anchors from the source renders."""
-    py = "C:/Users/Admin/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
+    py = sys.executable
     for src_name, out_name in [("case03_char_full.png", "case03_char_bust.png"),
                                ("case03_char_3q.png", "case03_anchor3.png")]:
         src = os.path.join(ASSETS, src_name)
@@ -244,7 +251,7 @@ def run_crop():
         cw = int(W * 0.62)
         left = max(0, min(W - cw, cx - cw // 2))
         dst = os.path.join(ASSETS, out_name)
-        ff = "C:/Users/Admin/.workbuddy/binaries/python/envs/default/Lib/site-packages/static_ffmpeg/bin/win32/ffmpeg.exe"
+        ff = _env.get_ffmpeg()
         subprocess.run([ff, "-v", "error", "-i", src, "-vf",
                         "crop=%d:%d:%d:%d,scale=%d:%d:flags=lanczos" % (
                             cw, bot - top, left, top, W, H),

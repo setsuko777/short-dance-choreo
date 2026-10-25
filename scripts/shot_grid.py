@@ -15,6 +15,11 @@
   python shot_grid.py 15 96 --all       # 列出全部可行解
   python shot_grid.py 15 96 --json      # JSON 输出（供管线消费）
 """
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _env  # noqa: E402  环境适配层（消除本机硬编码路径）
+_env.ensure_deps()
 import argparse
 import itertools
 import json

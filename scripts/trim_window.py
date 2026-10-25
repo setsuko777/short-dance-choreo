@@ -12,9 +12,15 @@
 用法：
   python trim_window.py in.m4a --ss 12.6 --t 15 -o window.wav [--json out.json]
 """
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _env  # noqa: E402  环境适配层（消除本机硬编码路径）
+_env.ensure_deps()
 import argparse
 import json
 import subprocess
+import os
 import sys
 from pathlib import Path
 
@@ -22,7 +28,6 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent))
 from beat_tracker import SR, analyze, decode_audio  # noqa: E402
-from static_ffmpeg import run  # noqa: E402
 
 
 def decode_raw(ffmpeg, path):
@@ -57,7 +62,7 @@ def main():
                     help="顺带跑节拍分析并写 JSON（可选）")
     a = ap.parse_args()
 
-    ffmpeg, _ = run.get_or_fetch_platform_executables_else_raise()
+    ffmpeg = _env.get_ffmpeg()
     x = decode_raw(ffmpeg, a.input)
     i0 = int(round(a.ss * SR))
     i1 = min(len(x), i0 + int(round(a.duration * SR)))

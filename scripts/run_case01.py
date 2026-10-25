@@ -13,6 +13,11 @@ Deviations from the ditz5s snapshot template (documented, reversible):
   4. Per-shot prompt (English rendering of case-01 Chinese shot descriptions,
      same content), per-shot length/seed/filename_prefix.
 """
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _env  # noqa: E402  环境适配层（消除本机硬编码路径）
+_env.ensure_deps()
 import json
 import os
 import shutil
@@ -22,11 +27,13 @@ import time
 import urllib.error
 import urllib.request
 
+
+
 BASE = "http://127.0.0.1:8188"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # skill root
 SNAP = os.path.join(ROOT, "scripts", "h3_snapshot.json")
 ASSETS = os.path.join(ROOT, "cases", "assets")
-OUTDIR = "F:/MI10-PRO+/MI10-PRO+/MI10-Pro+/ComfyUI/output/CASE-2026-1024-01"
+OUTDIR = os.path.join(_env.get_comfy_output() or ".", "CASE-2026-1024-01")
 STATUS = os.path.join(ASSETS, "run_status.json")
 CLIENT = "short-dance-choreo"
 

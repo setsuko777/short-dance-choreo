@@ -1,6 +1,9 @@
 # 成片与 QA 抽帧图（体积大，不入库）
 cases/assets/
 
+# 本机私有配置（含绝对路径，不入库；模板见 config.example.json）
+config.json
+
 # Python 缓存
 __pycache__/
 *.pyc

@@ -76,7 +76,7 @@ M1 样例 #01 用**假设 96 BPM**（切点 0/2.5/5/7.5/10/12.5/15s，假设 dro
 
 ## 六、素材清单
 
-`assets/`：5 个分析窗口（wav + json）+ 源曲索引。窗口由 `scripts/trim_window.py` 从 `C:/Users/Admin/cloud_cache/` 的剪映曲库缓存样本级裁切（仅供本 Skill 开发测试；对外发布不内置、不分发）。
+`assets/`：5 个分析窗口（wav + json）+ 源曲索引。窗口由 `scripts/trim_window.py` 从源曲样本级裁切（源曲不随仓库分发，用自己的音频重跑即可）。
 
 **CASE-01 v1 运行产物**（2026-10-24，本地 ComfyUI）：`shot1.mp4`～`shot6.mp4`（分镜原片，832×1472 hevc）+ `CASE-2026-1024-01-final.mp4`（成片，1080×1920 h264 15.04s）+ `qa_*.png`（QA 抽帧）+ `run_status.json`（运行状态）。角色参考 = 用户收藏 Fioni 双图（已复制到 ComfyUI `input/fioni_full.png`、`fioni_bust.png`）；每镜音乐切片 `input/case01_s1..s6.wav`。
 

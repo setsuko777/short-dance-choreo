@@ -9,6 +9,11 @@ anchors from it (see make_anchor03.py).
 Usage:
   python make_char.py [seed ...]     # default: 2 candidate seeds
 """
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import _env  # noqa: E402  环境适配层（消除本机硬编码路径）
+_env.ensure_deps()
 import json
 import os
 import shutil
@@ -16,12 +21,14 @@ import sys
 import time
 import urllib.request
 
+
+
 BASE = "http://127.0.0.1:8188"
 CLIENT = "short-dance-choreo"
 W, H = 832, 1472  # exact H3 canvas for this case (9:16)
 CKPT = "IL-illustriousSemi_v30.safetensors"
-OUT_DIR = "F:/MI10-PRO+/MI10-PRO+/MI10-Pro+/ComfyUI/output/case03"
-INPUT_DIR = "F:/MI10-PRO+/MI10-PRO+/MI10-Pro+/ComfyUI/input"
+OUT_DIR = os.path.join(_env.get_comfy_output() or ".", "case03")
+INPUT_DIR = _env.get_comfy_input()
 SEEDS = [2026102401, 2026102402]
 
 POS = ("masterpiece, best quality, amazing quality, very aesthetic, absurdres, "
