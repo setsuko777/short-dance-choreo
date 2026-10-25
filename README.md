@@ -169,6 +169,18 @@ python _env.py --init       # 只在缺项时跑：交互式生成 config.json�
 
 ### 最快起跑
 
+**最省事的安装方式：让 AI 帮你装。**
+
+把整个技能包丢给你的 AI（Codex / Claude Code / WorkBuddy / Cursor 等），说一句：
+
+> 「按这个包里的 INSTALL.md，帮我把技能装上」
+
+它会自己找到你电脑上的用户级技能目录、把 `short-dance-choreo` 复制进去、检查好并告诉你装在哪。
+你不用去找 `~/.workbuddy/skills/` 之类的路径，也不用敲任何命令。
+（`INSTALL.md` 就是为这个场景写的，里面写清了 AI 该做什么、不该做什么。）
+
+装好之后：
+
 - 要提示词：直接给 Skill 一句话指令（见用法一）
 - 要成片：先 `python _env.py --check`，再复制 `cases/CASE-2026-1025-02.md`（直出）或
   `cases/CASE-2026-1025-01.md`（逐镜）的结构，替换角色图与音乐窗口
